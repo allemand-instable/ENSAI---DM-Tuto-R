@@ -1,0 +1,400 @@
+
+---
+title: "Tutoriel sur la fonction merge et ses applications"
+author: "Kephan Missamou, Hugo Brunet et Adel Bendounan"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library("png")
+library(learnr)
+library(magick)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Un ptit échauffement
+
+### Fiche explicative:
+
+*Voici une fiche explicative de la fonction merge et de ses applications.*
+
+La fonction merge() fait partie des fonctions utiles dans le cas ou l’on veut joindre 2 tables, avec la particularité de les joindre selon une clé (Cf Analogie avec la jointure de 2 tables sur SQL)
+
+Il faut savoir qu’une jointure à l’aide de merge peut se réaliser sur des tables n’ayant pas le même nombre de lignes. Il suffit qu’il existe une clé commune entre les 2 tables (càd une colonne unique commune aux 2 tables, telle que les observations soient de même type [i.e str,int,...] et “égales”)
+
+Si df1 et df2 désignent 2 data.frame, alors
+
+![](C:/Users/DELL/Documents/Cours ENSAI/Nouveau dossier/Devoir maison StatR/Untitled/Jointure.png)
+
+
+#### INNER JOIN:
+
+merge( x = df1, # table de gauche
+      y = df2, # table de droite
+              by = ‘nom colonne clé’, #si le nom de la colonne clé est le même sur chaque data frame
+               # sinon
+               by.x = ‘colonne clé de x’,
+               by.y = ‘colonne clé de y’
+                 )
+
+#### JOINTURE A GAUCHE:
+
+merge( x = df1,  # table de gauche
+       y = df2,  # table de droite
+      by = ‘nom colonne clé’, #si le nom de la colonne clé est le même sur chaque data frame
+      # sinon
+      by.x = ‘colonne clé de x’,
+      by.y = ‘colonne clé de y’,
+      # JOINTURE À GAUCHE
+      all.x = TRUE
+      )
+
+#### JOINTURE A DROITE:
+
+merge( x = df1, # table de gauche
+              y = df2, # table de droite
+              by = ‘nom colonne clé’, #si le nom de la colonne clé est le même sur chaque data frame
+               # sinon
+               by.x = ‘colonne clé de x’,
+               by.y = ‘colonne clé de y’
+              #JOINTURE À GAUCHE
+              all.y = TRUE
+              )
+
+#### FULL OUTER JOIN:
+
+merge( x = df1, # table de gauche
+              y = df2, # table de droite
+              by = ‘nom colonne clé’, #si le nom de la colonne clé est le même sur chaque data frame
+               # sinon
+               by.x = ‘colonne clé de x’,
+               by.y = ‘colonne clé de y’
+              # FULL OUTER JOIN
+              all = TRUE )
+
+### Quiz pour savoir si t'as bien compris
+
+*Plusieurs réponses sont possibles.*
+
+Voici quelques questions pour savoir si les concepts de base ont bien été compris:
+
+```{r quiz}
+quiz(
+  question("Quelles sont les fonctions qui permettent de concaténer 2 tableaux ?",
+    answer("cbind", correct = TRUE),
+    answer("rbind", correct = TRUE),
+    answer("merge", correct = TRUE),
+    answer("ls()")
+  ),
+  question("Combien de facon de merger des tableaux existe-il ?",
+    answer("1"),
+    answer("2"),
+    answer("3"),
+    answer("4", correct = TRUE)
+  ),
+  question("Quel est la condition primordiale pour que l'on puisse utiliser un merge ?",
+    answer("Les tableaux doivent avoir le même nombre de lignes"),
+    answer("Ils doivent avoir une colonne clé en communs", correct = TRUE),
+    answer("Ils doivent avoir le même nombre de colonnes")
+  )
+)
+```
+
+
+## Propriétés du merge
+
+### Ordre des procédures merge:
+
+
+1) Applique le code suivant, après avoir éxécuté le précédant:
+
+Concat1 = merge(Etudes,Indiv)
+Concat1 = merge(Concat1,Infos)
+Concat2 = merge(Etudes,Infos)
+Concat2 = merge(Concat2,Indiv)
+print(Concat1)
+print(Concat2)
+
+2) Que remarques tu quand tu regardes les 2 tableaux ? Qu'en déduit-tu comme propriété **triviale** ?
+
+
+```{r ex_a, exercise=TRUE}
+age = c(11,22,33)
+id = c(1739, 1907,2652)
+ville = c("Bruz", "Paris", "Berlin")
+Indiv = cbind(age,id,ville)
+
+filiere = c("MP", "MP", "MP")
+Prepa = c("Foche","Charlemagne","Saint-louis")
+Etudes = cbind(filiere,id,Prepa)
+
+prenom = c("Kefta","Brunette","Bendoudou")
+passion = c("Sapologie","Call of","SW")
+Infos = cbind(id,prenom,passion)
+
+```
+
+Voici l'une des premières propriétés du merge: L'ordre dans lequel on merge des tables est important pour l'ordre des colonnes dans la table finale
+
+### Utilisation de order sur un merge:
+
+Indiv2=Indiv[order(-id)]
+Etudes2 = Etudes[order(-id)]
+Infos2 = Infos[order(-id)]
+Concat1 = merge(Indiv,Etudes)
+Concat1 = merge(Concat1,Infos)
+Concat1 = Concat1[order(-id)]
+Concat2 = merge(Indiv2,Etudes2)
+Concat2 = merge(Concat2,Infos2)
+print(Concat1)
+print(Concat2)
+
+1) Execute le code précédant, après avoir pris le code au tout début de la feuille
+2) A quoi sert la fonction order ? Que fait t-on donc pour Etudes2 et Indiv2 ?
+3) Que remarques tu quand tu observe Concat1 et Concat2 ?
+
+```{r ex_b, exercise=TRUE}
+age = c(11,22,33)
+id = c(1739, 1907,2652)
+ville = c("Bruz", "Paris", "Berlin")
+Indiv = cbind(age,id,ville)
+
+filiere = c("MP", "MP", "MP")
+Prepa = c("Foche","Charlemagne","Saint-louis")
+Etudes = cbind(filiere,id,Prepa)
+
+prenom = c("Kefta","Brunette","Bendoudou")
+passion = c("Sapologie","Call of","SW")
+Infos = cbind(id,prenom,passion)
+
+```
+
+Voici ainsi l'une des propriétés du merge: L'ordre selon lequel la clé est agencé n'a aucune influence sur le merge, puisque ce dernier ordonnera automatiquement selon l'ordre croissant de la clé...
+
+### Valeur manquante ou différentes dans une même clé:
+
+
+1) Execute le code précédant. Que remarques tu si tu regardes bien Concat et ton code? Comment peux-tu le justifier ?
+2) Rajoutes maintenant dans le merge all.x = TRUE. Que se passe-t-il ? Comment peux tu l'expliquer ?
+
+```{r ex_c, exercise=TRUE}
+age = c(11,22,33)
+id = c(1739, 1907,2652)
+ville = c("Bruz", "Paris", "Berlin")
+Indiv = cbind(age,id,ville)
+
+filiere = c("MP", "MP", "MP")
+Prepa = c("Foche","Charlemagne","Saint-louis")
+id = c(1739,1907,0)
+Etudes = cbind(filiere,id,Prepa)
+
+prenom = c("Kefta","Brunette","Bendoudou")
+passion = c("Sapologie","Call of","SW")
+Infos = cbind(id,prenom,passion)
+
+Concat=merge(Indiv,Etudes)
+
+```
+
+
+Ainsi voici une autre propriété de la fonction merge: Le merge entre 2 tables peut créer une table de dimension plus petite que les 2 précédentes dans le cas, ou le contenu de leur clé commune serait différent. Il est toujours possible de revenir à la taille originelle, mais des cases NA apparaiteraient si on utilise all.x ou all.y = TRUE
+
+
+## Travail sur les différents types de jointures:
+
+### Exercise with Hint
+
+*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+
+Modify the following code to limit the number of rows printed to 5:
+
+```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+mtcars
+```
+
+```{r print-limit-hint}
+head(mtcars)
+```
+
+
+
+### Jointure à gauche ? jointure à droite ?
+
+*choisir le choix de jointure dépend des tables concernées et de l'ordre dans lequel elles apparaissent dans le code*
+
+on souhaite
+
+- faire apparaître à chaque commande, l'e-mail, et l'adresse de livraison associée à la commande
+
+(afin de pouvoir expédier les chaussures de Kefta en bonnes conditions)
+
+
+- le faire de 2 façons différentes :
+  - en jointure à gauche
+  - en jointure à droite
+
+
+```{r ex_jointure_left_right, exercise=TRUE}
+
+user_id = c(1, 13, 1943, 7)
+prenom = c("Keph", "Huguette", "Klepstadd", "Ne va pas")
+nom = c("Missanou", "Bruno", "Brimnes", "être élu")
+liste = c("La Sexion", "La Sexion", "La Sexion", "Le Gaaaaaangsss")
+mail = c("casert@faislexo.com", "arien@faislexo.com", "dessayerdenvoyer@faislexo.com", "denvoyerdesemailsacesadresses@faislexo.com")
+adresse = c("7 Rue Tu vas faire l'exo", "8bis Avenue de tu passes aux rattrapages", "ZAC Rive-Ouest, 14 Avenue des Touches, 35740 Pacé", "13 rue du partiel")
+
+
+users_table = cbind(user_id, nom, prenom, liste, mail, adresse)
+
+achat_user_id = c(1, 13, 7, 7, 7, 7, 1, 1, 1, 1, 1, 1, 1, 1943, 1943, 13, 13, 7, 13, 1943)
+achat_id=c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+article = c("des Nike", "rien de spécial", "une campagne BDE", "la bière qui va avec", "les votes", "des bassines", "bah des Nikes", "des Jordans", "encore des Nikes", "vous ne devinerez pas", "Encore des Nikes ?", "c est beau d etre fonc", "un bandeau a l envers", "strölig", "tourne vis cruciforme", "une vie", "un projet stat", "chemise", "de l humour", "une boite à vis")
+date = c("2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15", "2021-03-15")
+
+achats_table = cbind(achat_id, achat_user_id, date, article)
+
+
+print("USERS")
+
+print(users_table)
+
+
+print("ACHATS")
+
+print(achats_table)
+
+```
+
+
+### on y va all-in(ner join)
+
+reprenons encore nos utilisateurs favoris, et pratiquons un INNER JOIN :
+
+- que remarquez vous ?
+- comment s'assurer que la commande 7 soit assurée ?
+
+
+```{r ex_jointure_left_right, exercise=TRUE}
+user_id = c(1, 13, 1943, 7, 111211211)
+prenom = c("Keph", "Huguette", "Klepstadd", "Ne va pas", "John")
+nom = c("Missanou", "Bruno", "Brimnes", "être élu", "Conway")
+liste = c("La Sexion", "La Sexion", "La Sexion", "Le Gaaaaaangsss", "suite audioactive")
+mail = c("casert@faislexo.com", "arien@faislexo.com", "dessayerdenvoyer@faislexo.com", "denvoyerdesemailsacesadresses@faislexo.com", "ontaimeconway@lebest.uk")
+adresse = c("7 Rue Tu vas faire l'exo", "8bis Avenue de tu passes aux rattrapages", "ZAC Rive-Ouest, 14 Avenue des Touches, 35740 Pacé", "13 rue du partiel", "je connais pas son adresse")
+
+users_table = cbind(user_id, nom, prenom, liste, mail, adresse)
+
+
+achat_user_id = c(1, 13, 1943, 1, 7, 1, 42, 1)
+achat_id = c(1, 2, 3, 4, 5, 6, 7, 314159265359)
+article = c("des chaussures Nike", "une validation de semestre", "une table basse", "des chaussures Nike", "mon petit dejeuner", "des chaussures Nike", "la réponse à La grande question sur la vie, l univers et le reste", "le nombre pi")
+date = c("2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15")
+achats_table = cbind(achat_id, achat_user_id, date, article) = c()
+
+
+
+print("USERS")
+
+print(users_table)
+
+
+print("ACHATS")
+
+print(achats_table)
+
+```
+
+
+
+### full joiner que je suis
+
+
+à partir du même jeu de donnée, réaliser un FULL Join
+
+- Que dire de la commande 7 ?
+- d'autres remarques ?
+
+
+```{r ex_jointure_left_right, exercise=TRUE}
+user_id = c(1, 13, 1943, 7, 111211211)
+prenom = c("Keph", "Huguette", "Klepstadd", "Ne va pas", "John")
+nom = c("Missanou", "Bruno", "Brimnes", "être élu", "Conway")
+liste = c("La Sexion", "La Sexion", "La Sexion", "Le Gaaaaaangsss", "suite audioactive")
+mail = c("casert@faislexo.com", "arien@faislexo.com", "dessayerdenvoyer@faislexo.com", "denvoyerdesemailsacesadresses@faislexo.com", "ontaimeconway@lebest.uk")
+adresse = c("7 Rue Tu vas faire l'exo", "8bis Avenue de tu passes aux rattrapages", "ZAC Rive-Ouest, 14 Avenue des Touches, 35740 Pacé", "13 rue du partiel", "je connais pas son adresse")
+
+users_table = cbind(user_id, nom, prenom, liste, mail, adresse)
+
+
+achat_user_id = c(1, 13, 1943, 1, 7, 1, 42, 1)
+achat_id = c(1, 2, 3, 4, 5, 6, 7, 314159265359)
+article = c("des chaussures Nike", "une validation de semestre", "une table basse", "des chaussures Nike", "mon petit dejeuner", "des chaussures Nike", "la réponse à La grande question sur la vie, l univers et le reste", "le nombre pi")
+date = c("2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15","2021-03-15")
+achats_table = cbind(achat_id, achat_user_id, date, article) = c()
+
+
+
+print("USERS")
+
+print(users_table)
+
+
+print("ACHATS")
+
+print(achats_table)
+
+```
+
+
+
+## Pour plus d'approffondissement:
+
+*Voila le problème final, fait en sorte de faire de ton mieux hihiiii*
+
+1) Execute le code suivant
+2) Affiche le nom des personnes qui font russes
+3) Affiche le nom des personnes et leur filière qui ont une moyenne supérieure ou égales à 13 et qui font L3
+4) Affiche la passion de la personne qui fait le plus d'activité en dehors de l'ENSAI
+5) Affiche le nombre d'option/d'activités que chaque membre de liste fait
+
+```{r ex_final, exercise=TRUE}
+age = c(11,22,33)
+id = c(1739, 1907,2652)
+ville = c("Bruz", "Paris", "Berlin")
+Indiv = cbind(age,id,ville)
+
+filiere = c("MP", "MP")
+Prepa = c("Foche","Charlemagne","Saint-louis")
+Etudes = cbind(filiere,id,Prepa)
+
+prenom = c("Kefta","Brunette","Bendoudou")
+passion = c("Sapologie","Call of","SW")
+Infos = cbind(id,prenom,passion)
+
+Moyenne = c(13,14,12)
+FaitL3 = c(TRUE,TRUE,FALSE)
+Note = cbind(id,Moyenne,filiere,FaitL3)
+
+FaitpartiJE = c(FALSE,FALSE,FALSE)
+JE = cbind(id,prenom,FaitpartiJE)
+
+FaitpartiEJR = c(FALSE,TRUE,FALSE)
+Est_bonencuisine = c(FALSE,FALSE,FALSE)
+EJR = cbind(prenom,FaitpartiEJR,Est_bonencuisine)
+
+Liste = c("Barbadata","Prostat","SAF")
+
+Choix_Option = c("Allemand","Russe","Peinture")
+Est_langue = c(TRUE,TRUE,TRUE)
+Option = cbind(prenom,Choix_Option,Est_langue)
+
+print(Option)
+print(EJR)
+print(JE)
+print(Note)
+print(Infos)
+print(Etudes)
+print(Indiv)
+```
