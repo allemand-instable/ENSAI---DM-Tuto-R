@@ -204,22 +204,6 @@ Ainsi voici une autre propriété de la fonction merge: Le merge entre 2 tables 
 
 ## Travail sur les différents types de jointures:
 
-### Exercise with Hint
-
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
-
-Modify the following code to limit the number of rows printed to 5:
-
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
-```
-
-```{r print-limit-hint}
-head(mtcars)
-```
-
-
-
 ### Jointure à gauche ? jointure à droite ?
 
 *choisir le choix de jointure dépend des tables concernées et de l'ordre dans lequel elles apparaissent dans le code*
@@ -348,29 +332,59 @@ print(achats_table)
 ```
 
 
+## Applications sur des cas concrets:
 
-## Pour plus d'approffondissement:
+### Une première utilisation de la fonction merge en cas pratique :
 
-*Voila le problème final, fait en sorte de faire de ton mieux hihiiii*
+*Adel a accès aux comptes Netflix de certains membres de la Sexion Datassaut. Il possède un premier tableau contenant tous leurs noms, prénoms, et identifiants respectifs. Il a un deuxième tableau qui associe à chaque identifiant le programme qu'il est en train de regarder actuellement (si un identifiant donné ne regarde rien, il y aura un NA). Enfin, il a un dernier tableau contenant les noms et prénoms des abonnés, leurs dates d'inscription, et la date de leur dernière connexion.*
+  
+  1) Affichez pour chaque personne son nom, son prénom, et le nom du programme qu'elle regarde actuellement
+2) Combien de personnes regardent actuellement Naruto Shippuden ? Même question pour Les Princes et les Princesses de l'Amour.
+3) Affichez les prénoms des abonnés à Netflix en triant de la date d'inscription la plus ancienne à la plus récente
+4) Quand est-ce que Léon s'est connecté pour la dernière fois ? Et Pierre ?*
+
+
+```{r ex_e, exercise=TRUE}
+nom = c("Bendounan", "Choquet", "Kebrit", "Olivieri", "Brunet", "Missamou", "Kourtis", "Foussard", "Pain","Vasseur", "Zaidan", "Foucher")
+prenom = c("Adel", "Alice", "Badr", "Emy", "Hugo", "Kephan", "Léon", "Oriane", "Guillaume", "Pierre", "Sarah", "Alice")
+id = c(55, 59, 47, 73, 14, 96, 03, 22, 11, 08, 34) 
+abonnes = cbind(nom, prenom, id)
+
+programme = c("Les Princes et Les Princesses de l'Amour", "Les Princes et Les Princesses de l'Amour", "Naruto Shippuden", "Gossip Girl", "One Punch Man", "Naruto Shippuden", NA, "Naruto Shippuden", "Narcos", NA, "Les Princes et Les Princesses de l'Amour", NA)
+visionnages = cbind(programme,id)
+
+date_inscription = c(2017-07-03, 2016-10-22, 2019-02-14, 2016-05-18, 2017-01-30, 2018-09-04, 2020-04-07, 2016-11-16, 2019-03-13, 2018-06-18, 2017-05-29, 2019-07-14)
+derniere_connexion = c(2021-03-12, 2021-03-12, 2021-03-12, 2021-03-12, 2021-03-12, 2021-03-12, 2021-03-04, 2021-03-12, 2021-03-12, 2021-01-18, 2021-03-12, 2020-12-26)
+horodateur = cbind(nom, prenom, date_inscription, derniere_connexion)
+
+print(abonnes)
+print(visionnages)
+print(horodateur)
+```
+
+### 
+*L'ENSAI a accès aux infos de 4 personnes, le but est de pouvoir tirer des informations utiles de ces tableaux*
 
 1) Execute le code suivant
-2) Affiche le nom des personnes qui font russes
-3) Affiche le nom des personnes et leur filière qui ont une moyenne supérieure ou égales à 13 et qui font L3
-4) Affiche la passion de la personne qui fait le plus d'activité en dehors de l'ENSAI
-5) Affiche le nombre d'option/d'activités que chaque membre de liste fait
+2) Quelles sont les potentielles clés possibles ?
+3) Affiche le nom des personnes qui font russes
+4) Affiche le nom des personnes et leur filière qui ont une moyenne supérieure ou égales à 13 et qui font L3
+5) Affiche la passion de la personne qui fait le plus d'activité en dehors de l'ENSAI
+6) Affiche le nombre d'option/d'activités que chaque membre de liste fait
+
 
 ```{r ex_final, exercise=TRUE}
-age = c(11,22,33)
-id = c(1739, 1907,2652)
-ville = c("Bruz", "Paris", "Berlin")
+age = c(11,22,33) 
+id = c(1739, 1907,2652) 
+ville = c("Bruz", "Paris", "Berlin") 
 Indiv = cbind(age,id,ville)
 
-filiere = c("MP", "MP")
-Prepa = c("Foche","Charlemagne","Saint-louis")
+filiere = c("MP", "MP") 
+Prepa = c("Foche","Charlemagne","Saint-louis") 
 Etudes = cbind(filiere,id,Prepa)
 
-prenom = c("Kefta","Brunette","Bendoudou")
-passion = c("Sapologie","Call of","SW")
+prenom = c("Kefta","Brunette","Bendoudou") 
+passion = c("Sapologie","Call of","SW") 
 Infos = cbind(id,prenom,passion)
 
 Moyenne = c(13,14,12)
@@ -385,6 +399,9 @@ Est_bonencuisine = c(FALSE,FALSE,FALSE)
 EJR = cbind(prenom,FaitpartiEJR,Est_bonencuisine)
 
 Liste = c("Barbadata","Prostat","SAF")
+RoleEcole = c("BDE","BDA","BDS")
+Gang = cbind(prenom,Liste,RoleEcole)
+
 
 Choix_Option = c("Allemand","Russe","Peinture")
 Est_langue = c(TRUE,TRUE,TRUE)
@@ -397,4 +414,42 @@ print(Note)
 print(Infos)
 print(Etudes)
 print(Indiv)
+print(Gang)
+```
+
+
+
+### Mangas > BD :
+
+*Nos chers protagonistes souhaitent partir en voyage covid-friendly tous en ensemble l'été. Ils se sont mit d'accord pour se retrouver à Angoulême en fin août 2021. Etant dispersés dans la France, ils souhaitent s'organiser pour arriver à des dates assez proches. Ils disposent de plusieurs informations sur le site de la SNCF.*
+
+1) Affichez une table contenant les prénoms de chaque personne ainsi que les tarifs des différents trains vers en Angoulême au départ de leurs villes actuelle, triée du plus haut prix au plus bas.
+2) Affichez une table contenant les prénoms de chaque personne, et la date fixée de leurs voyages. Qui arrivera en premier ? Et en dernier ?
+3) Y'aura t il des personnes voyageant à bord du même train ? Si oui, affichez les dans un tableau.
+4) Affichez une table contenant les noms et prénoms des personnes qui voyageront dans un train marqué complet ?
+  5) Combien, au total, les amis auront ils déboursés pour se rendre à Angoulême ?
+  
+```{r ex_f, exercise=TRUE}
+nom = c("Bendounan", "Choquet", "Kebrit", "Olivieri", "Brunet", "Missamou", "Kourtis", "Foussard", "Pain","Vasseur", "Zaidan", "Foucher")
+prenom = c("Adel", "Alice", "Badr", "Emy", "Hugo", "Kephan", "Léon", "Oriane", "Guillaume", "Pierre", "Sarah", "Alice")
+id = c(55, 59, 47, 73, 14, 96, 03, 22, 11, 08, 34) 
+ville_actuelle = c("Paris", "Nantes", "Lyon", "Marseille", "Paris", "Paris", "Montpellier", "Nice", "Perpignan", "Strasbourg", "Lyon", "Lille")
+clients = cbind(nom, prenom, ville_actuelle, id)
+
+ville_depart = c("Paris", "Paris", "Paris", "Marseille", "Marseille", "Lyon", "Lyon", "Rennes", "Perpignan", "Nice", "Strasbourg", "Bordeaux", "Montpellier", "Lille", "Nantes")
+date_train = c(2021-08-03, 2021-08-17, 2021-08-25, 2021-08-16, 2021-08-21, 2021-08-15, 2021-08-28, 2021-08-14, 2021-08-20, 2021-08-19, 2021-08-16, 2021-08-19, 2021-08-18, 2021-08-17)
+tarifs = c(20, 65, 35, 15, 40, 30, 22, 70, 35, 45, 75, 30, 67, 45)
+id_train = c(7792, 8912, 3197, 1820, 4728, 5367, 4627, 4427, 9735, 2546, 5367, 3576, 2678, 7642)
+trains = cbind(date_train, tarifs, id_train)
+
+est_complet = c(TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)
+booking = cbind(id_train, est_complet)
+
+voyages = c(7792, 7642, 4627, 1820, 3197, 3197, 3576, 9735, 4427, 2546, 4627, 2678)
+trajets = cbind(id, voyages)
+
+print(clients)
+print(booking)
+print(trains)
+print(trajets)
 ```
